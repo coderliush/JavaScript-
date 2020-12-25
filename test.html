@@ -16,46 +16,8 @@
 <body>
 
     <script>
-        Function.prototype.call2 = function (context) {
-            context = context ? Object(context) : window
-            //  实现 1 2。如果 context 是个字符串或者数字，Object(context) 返回一个对象，才能调用 context.fn
-            context.fn = this
-            // call2 的调用者是 bar 函数，this指向这个函数，context为null，赋值为window， this指向 window。context为字符串，this指向这个字符串
-            var args = []
-            for (var i = 0, len = arguments.length; i < len; i++) {
-                args.push(arguments[i])
-            }
-            const res = context.fn(...args)
-            //  函数执行， this 指向传入的对象
-            delete context.fn
-            return res // 实现3
-        }
-        Function.prototype.call1 = (context, ...args) => {
-            // context 如果为 string 或者 number，Object(context) 转为对象，以便在它上面挂载函数
-            context = context ? Object(context) : window
-            // 示例中 call 函数的调用者为 bar，即 this 指向 bar 函数
-            context.fn = this
-            console.log('tihs', this);
-            // 使 bar 函数的 this 指向 context. 执行函数，如果函数有返回值，return 返回值
-            let res = context.fn(args)
-            delete context.fn
-            // return 函数返回值
-            return res
-        }
 
-        function Product(name, price) {
-            this.name = name;
-            this.price = price;
-        }
-
-        function Food(name, price) {
-            Product.call1(this, name, price);
-            this.category = 'food';
-        }
-
-        let food = new Food('cheese', 5)
-
-        console.log(food.name);
+      
 
 
     </script>

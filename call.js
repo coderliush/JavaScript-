@@ -3,50 +3,43 @@
 
 //  call 的作用是什么
 //  1. 修改函数的 this 指向    
-//  2. 调用其他函数的方法   
+//  2. 调用其他函数的方法，单个传入参数（apply 传入一个数组）   
 
-// call 怎么用
-var foo = {
-    value: 1
+var foo = {}
+function bar(param1, param2) {
+    console.log(this)
+    console.log(param1, param2)
 }
-function bar(name) {
-    this.name = name
-    console.log(this.value)  // 1
-}
-bar.call(foo, 'name')
+bar.call(foo, '1', '2')     // foo.  1,2
+bar.apply(foo, ['1', '2'])  // foo.  1,2
 
 // es6 call 的实现
 Function.prototype.call = (context, ...args) => {
     let context = context ? Object(context) : window
-    context.fn = this
-    let res = context.fn(args)
+    context.fn = this  // 获取 call 的调用者，即上文的 bar 函数
+    let res = context.fn(...args)  // 传入参数，执行 bar 函数. 修改 this 指向传入的 foo
     delete context.fn
     return res
 }
 
 // es5 call
-Function.prototype.call = function(context) {
-    let args = []
-    context = context ? Object(context) : window
-    // 示例中 call 函数的调用者为 bar，即 this 指向 bar 函数
-    context.fn = this   
-    for (var i = 1; i < arguments.length; i ++ ) {
-        args.push(arguments[i])
+Function.prototype.call = function (context) {
+    let context = context ? Object(context) : window
+    context.fn = this
+    var args = []
+    for(var i = 1, len = arguments.length; i < len; i++) {
+        args.push('arguments[' + i + ']')
     }
-    let res = context.fn(args)
+    var result = eval('context.fn(' + args + ')')
     delete context.fn
-    // return 函数返回值
-    return res
+    return result
 }
 
 // apply 的实现
 Function.prototype.apply = function(context, ...args) {
-    // context 如果为 string 或者 number，Object(context) 转为对象，以便在它上面挂载函数
     context = context ? Object(context) : window
-    // 示例中 call 函数的调用者为 bar，即 this 指向 bar 函数
-    context.fn = this
-    // 使 bar 函数的 this 指向 context. 执行函数，如果函数有返回值，return 返回值
-    let res = context.fn(...args)
+    context.fn = this  
+    let res = context.fn(args)   // 执行apply 参数为数组
     delete context.fn
     // return 函数返回值
     return res

@@ -17,30 +17,45 @@
 
     <script>
 
-        var obj = {
-            age: 18,
-            myFun: function (a, b, c) {
-                console.log('this', this);
-                console.log(a, b, c)
+        const target = {
+            field1: 1,
+            field2: undefined,
+            field3: {
+                child: 'child'
+            },
+            field4: [2, 4, 8],
+            field5: function () { console.log(1) },
+            field6: () => { console.log(2) }
+        };
+
+        function getType(target) {
+            return Object.prototype.toString.call(target);
+        }
+
+
+        function cloneDeep(target) {
+            let newTarget 
+            let type = Object.prototype.toString.call(target)
+            if (type === '[object Object]') {
+                for (let k in target) {
+                    newTarget = {}
+                    newTarget[k] = cloneDeep(target[k])
+                }
+            } else if (type === '[object Array]') {
+                newTarget = []
+                target.forEach(item => newTarget.push(cloneDeep(item)))
+            } else if (type === '[object Function]') {
+                newTarget = target.bind({})
+            } else {    // string number
+                newTarget = {}
+                for (let k in target) {
+                    newTarget[k] = target[k]
+                }
             }
+            return newTarget
         }
 
-        var db = {
-            name: 1
-        }
-
-        Function.prototype.bind1 = function () {
-            var thatFn = this
-            var context = arguments[0]
-            var args = [].slice.call(arguments, 1)
-            return function () {
-                var argsList = args.concat([].slice.call(arguments))
-                thatFn.apply(context, argsList)
-            }
-        }
-
-        let bound = obj.myFun.bind1(db, '1', '2')
-        console.log(bound());
+        console.log(cloneDeep(target));
 
     </script>
 </body>
